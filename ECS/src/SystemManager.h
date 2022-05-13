@@ -178,7 +178,7 @@ namespace ECS {
 		}
 
 		// Deregisters all systems
-		void DeregisterAllSystems()
+		bool DeregisterAllSystems()
 		{
 			for (auto* s : m_activeSystems) {
 
@@ -191,8 +191,7 @@ namespace ECS {
 
 			}
 
-			m_activeSystems.empty();
-
+			return m_activeSystems.empty();
 		}
 
 

@@ -1,8 +1,6 @@
 #ifndef OBJECTPOOL_H
 #define OBJECTPOOL_H
 
-#include "Debug.h"
-
 #include <vector>
 #include <map>
 
@@ -41,8 +39,7 @@ public:
 
 		if( object == nullptr )	// Could not create object
 		{
-			DEBUG_LOG( LOG::WARNING, "Failed to create object: object is nullptr" );
-			CONSOLE_LOG( LOG::WARNING, "Failed to create object: object is nullptr" );
+			return;
 		}
 		objects.push_back( object );
 	}
@@ -60,8 +57,6 @@ public:
 
 		if( object == nullptr )	// Could not create object
 		{
-			DEBUG_LOG( LOG::WARNING, "Failed to create object: object is nullptr" );
-			CONSOLE_LOG( LOG::WARNING, "Failed to create object: object is nullptr" );
 			return nullptr;
 		}
 		return object;
@@ -75,8 +70,6 @@ public:
 		T* object = nullptr;
 		if( objects.size() == 0 )
 		{
-			DEBUG_LOG( LOG::WARNING, "Failed to get object: object pool size is 0" );
-			CONSOLE_LOG( LOG::WARNING, "Failed to get object: object pool size is 0" );
 			return object;
 		}
 		object = objects[objects.size() - 1];
@@ -92,8 +85,6 @@ public:
 	{
 		if( object == nullptr )
 		{
-			DEBUG_LOG( LOG::WARNING, "Failed to return object to pool: object is nullptr" );
-			CONSOLE_LOG( LOG::WARNING, "Failed to return object to pool: object is nullptr" );
 			return;
 		}
 

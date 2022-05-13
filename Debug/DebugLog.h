@@ -33,8 +33,6 @@ constexpr static const char* ToString( LOG logType )
 
 #if DEBUG_MODE == 1
 
-
-
 /* Creates brand new output file for logging */
 #define DEBUG_INIT() ( DebugLog::DebugLogInit() )
 
