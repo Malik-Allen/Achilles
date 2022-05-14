@@ -1,5 +1,5 @@
-#ifndef WORLD_H
-#define WORLD_H
+#ifndef ECSWORLD_H
+#define ECSWORLD_H
 
 #include "EntityManager.h"
 #include "ComponentManager.h"
@@ -16,17 +16,13 @@ namespace ECS
 	*/
 	class World
 	{
-
-		// DLL Notes:
-		// Create a Create World Fucntion to return a new ECS::World()
-
 		EntityManager* m_enityManager;
 
 		SystemManager* m_systemManager;
 
 		ComponentManager* m_componentManager;
 
-		template<typename ... T >
+		template<typename ... T>
 		friend struct Parser;
 
 	public:
@@ -36,7 +32,9 @@ namespace ECS
 			m_enityManager( new ECS::EntityManager() ),
 			m_systemManager( new ECS::SystemManager() ),
 			m_componentManager( new ECS::ComponentManager( m_enityManager, m_systemManager ) )
-		{}
+		{
+			m_systemManager->SetWorld( this );
+		}
 
 		// Cleans and deletes ecs system
 		~World()
@@ -198,5 +196,5 @@ namespace ECS
 
 
 
-#endif // !WORLD_H
+#endif // !ECSWORLD_H
 
