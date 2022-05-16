@@ -1,8 +1,8 @@
 #ifndef DEBUGLOG_H
 #define DEBUGLOG_H
 
-#include <string>
 #include <format>
+#include <string>
 #include <iostream>
 #include <fstream>
 
