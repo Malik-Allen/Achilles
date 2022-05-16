@@ -1,58 +1,44 @@
 #include "../include/DebugLog.h"
-#include <fstream>
-#include <iostream>
-#include <time.h>
-#include <stdio.h>
 
 
-string DebugLog::outputLogFileName( "Output-Log.txt" );
+std::string DebugLog::outputLogFileName( "Output-Log.txt" );
 
 void DebugLog::DebugLogInit()
 {
-	ofstream outputFile;
-	outputFile.open( outputLogFileName, ios::out );	// We create the file using out just to make sure it is there and clears it
+	std::ofstream outputFile;
+	outputFile.open( outputLogFileName, std::ios::out );	// We create the file using out just to make sure it is there and clears it
 	outputFile.close();
 }
 
-void DebugLog::Log( const LOG logType, const string& message, const string& fileName, const string& function, const int line )
+std::string DebugLog::BuildTimeStamp()
 {
-	// Note on @param fileName:
-		// FileName is currently not in use, 
-		// it ends up causing a lot of clutter in logs, 
-		// Once I am able to use a relative rather than a direct path, it will be reconsidered 
-
-	ofstream outputFile;
-	outputFile.open( outputLogFileName, ios::app | ios::out );
-
 	/*
-		Code to obtain Date and Time stamps, adapted from:
-		https://www.daniweb.com/programming/software-development/threads/177665/help-with-asctime-s-and-localtime-s
-	*/
+		*	Code to obtain Date and Time stamps, adapted from:
+		*	https://www.daniweb.com/programming/software-development/threads/177665/help-with-asctime-s-and-localtime-s
+		*/
 	char date[9];
 	_strdate_s( date );
 	char timestamp[9];
 	_strtime_s( timestamp );
 
+	/*[05/15/22|21:33:51]*/
+	std::string dateTime;
+	dateTime.append( "[" );
+	dateTime.append( std::string( date ) );
+	dateTime.append( "|" );
+	dateTime.append( std::string( timestamp ) );
+	dateTime.append( "]" );
 
-	outputFile << "[" << date << "|" << timestamp << "]" << "[" << ToString( logType ) << "]:\t" << function << "(" << line << "):\t" << message << endl;
-	
-
-	outputFile.flush();
-	outputFile.close();
+	return dateTime;
 }
 
-void DebugLog::Console_Log( const LOG logType, const string & message, const string & fileName, const string& function, const int line )
+std::string DebugLog::BuildFunctionSignature(const std::string& function, const int lineNumber )
 {
-	/*
-		Code to obtain Date and Time stamps, adapted from:
-		https://www.daniweb.com/programming/software-development/threads/177665/help-with-asctime-s-and-localtime-s
-	*/
-	char date[9];
-	_strdate_s( date );
-	char timestamp[9];
-	_strtime_s( timestamp );
-
-	
-	cout << "[" << date << "|" << timestamp << "]" << "[" << ToString( logType ) << "]:\t" << function << "(" << line << "):\t" << message << endl;
-	
+	/*FunctionName(00):*/
+	std::string signature;
+	signature.append( function );
+	signature.append( "(" );
+	signature.append( std::to_string( lineNumber ) );
+	signature.append( ")" );
+	return signature;
 }

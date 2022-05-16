@@ -2,7 +2,9 @@
 #define DEBUGLOG_H
 
 #include <string>
-using namespace std;
+#include <format>
+#include <iostream>
+#include <fstream>
 
 enum class LOG : unsigned short
 {
@@ -16,7 +18,7 @@ enum class LOG : unsigned short
 
 constexpr static const char* ToString( LOG logType )
 {
-	switch ( logType )
+	switch( logType )
 	{
 	case LOG::NONE:			return "NONE";
 	case LOG::FATAL:		return "FATAL ERROR";
@@ -31,52 +33,111 @@ constexpr static const char* ToString( LOG logType )
 #define DEBUG_MODE 1
 #endif
 
-#if DEBUG_MODE == 1
-
+#if DEBUG_MODE == 1	// ON
 /* Creates brand new output file for logging */
 #define DEBUG_INIT() ( DebugLog::DebugLogInit() )
 
-/* Logs error to engine output log */
-#define DEBUG_LOG( LogType, Message ) ( DebugLog::Log( LogType, Message, __FILE__, __FUNCTION__, __LINE__ ) )
+/* Logs error to output log */
+#define OUTPUT_FILE_LOG( LogType, Message, ... ) ( DebugLog::OutputFile_Log( LogType, Message, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__ ) )
 
 /* Will print to console log */
-#define CONSOLE_LOG( LogType, Message ) ( DebugLog::Console_Log( LogType, Message, __FILE__, __FUNCTION__, __LINE__ ) )
+#define CONSOLE_LOG( LogType, Message, ... ) ( DebugLog::Console_Log( LogType, Message, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__ ) )
 
-#else
+/* Prints message to Output File and Console */
+#define DEBUG_LOG( LogType, Message, ... ) ( OUTPUT_FILE_LOG(LogType, Message, __VA_ARGS__ ), CONSOLE_LOG(LogType, Message, __VA_ARGS__ ) )
 
-/* Logs error to engine output log */
-#define DEBUG_LOG( LogType, Message )
+
+#else	// OFF
+/* Creates brand new output file for logging */
+#define DEBUG_INIT()
+
+/* Logs error to output log */
+#define OUTPUT_FILE_LOG( LogType, Message )
 
 /* Will print to console log */
 #define CONSOLE_LOG( LogType, Message ) 
 
-/* Creates brand new output file for logging */
-#define DEBUG_INIT()
+/* Prints message to Output File and Console */
+#define DEBUG_LOG( LogType, Message, ... )
+
 
 #endif
 
 
-// Static Debug Log Class
+/*
+*	Utility class for functionality around logging to console and output file
+*/
 class DebugLog
 {
 
 public:
-
 	DebugLog() = delete;	// Static class, no constructor needed
 	DebugLog( const DebugLog& ) = delete;
 	DebugLog& operator=( const DebugLog& ) = delete;
 	DebugLog( DebugLog&& ) = delete;
 	DebugLog& operator=( DebugLog&& ) = delete;
 
+
 	static void DebugLogInit();
-	static void Log( const LOG logType, const string& message, const string& fileName, const string& function, const int line );
-	static void Console_Log( const LOG logType, const string& message, const string& fileName, const string& function, const int line );
-	
+
+	template<typename ... Args>
+	static void OutputFile_Log( const LOG logType,
+		const std::string& message,
+		const std::string& fileName,
+		const std::string& function,
+		const int line,
+		Args&& ... args )
+	{
+		std::ofstream outputFile;
+		outputFile.open( outputLogFileName, std::ios::app | std::ios::out );
+
+		/*[05/15/22|21:33:51][INFO]:	FunctionName(00):	Message {}*/
+		std::string output;
+		output.append( BuildTimeStamp() );
+		output.append( "[" );
+		output.append( ToString( logType ) );
+		output.append( "]\t" );
+		output.append( BuildFunctionSignature(function, line) );
+		output.append( ":\t" );
+		output.append( message );
+		output.append( "\n" );
+
+		outputFile << std::format( output, std::forward<Args>( args )... );
+
+		outputFile.flush();
+		outputFile.close();
+	};
+
+
+	template<typename ... Args>
+	static void Console_Log( const LOG logType,
+		const std::string& message,
+		const std::string& fileName,
+		const std::string& function,
+		const int line,
+		Args&& ... args )
+	{
+		/*[05/15/22|21:33:51][INFO]:	FunctionName(00):	Message {}*/
+		std::string output;
+		output.append( BuildTimeStamp() );
+		output.append( "[" );
+		output.append( ToString( logType ) );
+		output.append( "]\t" );
+		output.append( BuildFunctionSignature( function, line ) );
+		output.append( ":\t" );
+		output.append( message );
+		output.append( "\n" );
+
+		std::cout << std::format( output, std::forward<Args>( args )... );
+	};
+
 private:
+	static std::string outputLogFileName;
 
-	static string outputLogFileName;
-
-
+	/* Returns a string in the format: [05/15/22|21:33:51]*/
+	static std::string BuildTimeStamp();
+	/* Returns a string in the format: FunctionName(00)*/
+	static std::string BuildFunctionSignature( const std::string& function, const int lineNumber );
 };
 
 
