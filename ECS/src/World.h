@@ -137,6 +137,13 @@ namespace ECS
 			m_componentManager->RemoveComponent<T>( entityId );
 		}
 
+		// Find the component class on the passed entity, returning the component if it exists
+		template<typename T>
+		T* FindComponentInEntity( EntityId entityId )
+		{
+			return m_componentManager->FindComponent<T>( entityId );
+		}
+
 
 		// Registers Systems, inside of system manager
 		template<typename T>

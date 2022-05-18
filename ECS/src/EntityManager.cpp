@@ -5,8 +5,7 @@ namespace ECS
 	EntityManager::EntityManager() :
 		m_entityCounter( 0 )
 	{
-
-		for( int i = 0; i < 10000; ++i )
+		for( int i = 0; i < MAX_ENTITIES; ++i )
 		{
 			m_entityPool.CreateNewObjectInPool();
 		}

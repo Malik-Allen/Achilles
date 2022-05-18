@@ -29,7 +29,7 @@ namespace ECS
 		uint64_t				m_componentCounter;
 
 		// Entity Manager reference
-		EntityManager*			m_entityManager;
+		EntityManager* m_entityManager;
 
 		using ComponentMap = std::map< uint64_t /*Component Type*/, std::vector<Component*> /*Components*/ >;
 
@@ -37,15 +37,15 @@ namespace ECS
 		ComponentMap			m_componentMap;
 
 		// System Manager reference
-		SystemManager*			m_systemManager;
+		SystemManager* m_systemManager;
 
 
 	public:
 
-		ComponentManager(EntityManager* entityManager, SystemManager* systemManager) : 
+		ComponentManager( EntityManager* entityManager, SystemManager* systemManager ) :
 			m_components(),
-			m_componentCounter( 0 ), 
-			m_entityManager(entityManager) ,
+			m_componentCounter( 0 ),
+			m_entityManager( entityManager ),
 			m_systemManager( systemManager )
 		{}
 
@@ -66,18 +66,18 @@ namespace ECS
 			CanConvert_From<T, Component>();
 
 			/* '>=' check work here because we increment component count after adding a component, and the counter begins 0 for the first index of the component map */
-			if ( m_componentCounter >= MAX_COMPONENTS )	// We are at capacity, return 
+			if( m_componentCounter >= MAX_COMPONENTS )	// We are at capacity, return 
 			{
 				return nullptr;
 			}
 
 			Entity* entity = m_entityManager->m_entities[entityId];
-			if ( entity == nullptr )	// Entity does not exist
+			if( entity == nullptr )	// Entity does not exist
 			{
 				return nullptr;
 			}
 
-			if ( entity->m_componentCounter >= MAX_COMPONENTS_PER_ENTITY )	// This entity is at its capacity
+			if( entity->m_componentCounter >= MAX_COMPONENTS_PER_ENTITY )	// This entity is at its capacity
 			{
 				return nullptr;
 			}
@@ -85,7 +85,7 @@ namespace ECS
 			// Component Classes can support different constructors, 0 -> n number of paramters in their constructor
 			T* component = new T( std::forward<Args>( args ) ... );
 
-			if ( component == nullptr )	// Could not create component
+			if( component == nullptr )	// Could not create component
 			{
 				return nullptr;
 			}
@@ -100,16 +100,58 @@ namespace ECS
 			++this->m_componentCounter;
 
 			// Also add a reference of this component to the ComponentMap
-			m_componentMap[T::ID].push_back( component );	
+			m_componentMap[T::ID].push_back( component );
 
-			if (m_systemManager) {
+			if( m_systemManager )
+			{
 				// This entity's signature has now changed update the system manager's systems
-				m_systemManager->OnEntitySignatureChanged(*entity);
+				m_systemManager->OnEntitySignatureChanged( *entity );
 			}
-			
+
 			return component;
 		}
 
+		/*
+		*	@brief	Finds the component of the passed class type on the passed entity
+		*	@param	<T>		The type of component to look for
+		*	@param	EntityId	The entityId of the entity to search inside of; for the component
+		*	@return	T*		Returns the component if found, returning nullptr, if otherwise
+		*/
+		template<typename T>
+		T* FindComponent( EntityId entityId )
+		{
+			// Complile-time check to see if class T can be converted to class B, 
+				// valid for derivation check of class T from class B
+			CanConvert_From<T, Component>();
+
+			Entity* entity = m_entityManager->m_entities[entityId];
+			if( entity == nullptr )	// Entity does not exist
+			{
+				return nullptr;
+			}
+
+			// Loop through the components of the same type, the id of the component type is used as the key to a vector of components 
+			Component* component = nullptr;
+
+			size_t size = m_componentMap[T::ID].size();
+			for( size_t i = 0; i < size; i++ )	// Iterator through vector of components from the same type
+			{
+				component = m_componentMap[T::ID][i];
+
+				if( component == nullptr )
+				{
+					continue;
+				}
+
+				if( component->m_ownerId == entityId )		// When we find the first component with the same owner, we can return it
+				{
+
+					return dynamic_cast<T*>( component );
+				}
+			}
+
+			return nullptr;
+		}
 
 		/*
 		*	Removes the passed component type from the entity with the passed entity id
@@ -124,7 +166,7 @@ namespace ECS
 			CanConvert_From<T, Component>();
 
 			Entity* entity = m_entityManager->m_entities[entityId];
-			if ( entity == nullptr )	// Entity does not exist
+			if( entity == nullptr )	// Entity does not exist
 			{
 				return;
 			}
@@ -133,7 +175,7 @@ namespace ECS
 			Component* component = nullptr;
 
 			size_t size = m_componentMap[T::ID].size();
-			for ( size_t i = 0; i < size; i++ )	// Iterator through vector of components from the same type
+			for( size_t i = 0; i < size; i++ )	// Iterator through vector of components from the same type
 			{
 				component = m_componentMap[T::ID][i];
 
@@ -142,7 +184,7 @@ namespace ECS
 					continue;
 				}
 
-				if ( component->m_ownerId == entityId )		// When we find the first component with the same owner, we will remove it
+				if( component->m_ownerId == entityId )		// When we find the first component with the same owner, we will remove it
 				{
 
 					// Remove the component, from the ComponentMap Vector, replacing the component to be removed with last component in the vector
@@ -152,13 +194,13 @@ namespace ECS
 					ComponentId componentId = component->m_componentId;
 
 					// Save this for the swapping later
-					uint64_t lastComponentId = --m_entityManager->m_entities[entityId]->m_componentCounter;	
+					uint64_t lastComponentId = --m_entityManager->m_entities[entityId]->m_componentCounter;
 
 					// Assign the component index of the component we are about to delete to the last component on this entity
 					m_entityManager->m_entities[entityId]->m_components[componentId] = m_entityManager->m_entities[entityId]->m_components[lastComponentId];
 
 					// If this component is a valid component, then we give it a new component id
-					if ( m_entityManager->m_entities[entityId]->m_components[componentId] != nullptr )
+					if( m_entityManager->m_entities[entityId]->m_components[componentId] != nullptr )
 					{
 						m_entityManager->m_entities[entityId]->m_components[componentId]->m_componentId = componentId;
 					}
@@ -175,13 +217,13 @@ namespace ECS
 					m_components[componentId] = m_components[lastComponentId];
 					m_components[lastComponentId] = nullptr;
 
-					if (m_components[componentId] != nullptr) 
+					if( m_components[componentId] != nullptr )
 					{
 						m_components[componentId]->m_componentManagerId = componentId;
 					}
 
 					// Update systems, now that we have removed a component from this entity
-					m_systemManager->OnEntitySignatureChanged(*entity);
+					m_systemManager->OnEntitySignatureChanged( *entity );
 
 					MarkComponentForCleanUp( component );
 

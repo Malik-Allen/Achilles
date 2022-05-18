@@ -18,7 +18,7 @@ public:
 
 	~ObjectPool()
 	{
-		size_t poolSize = objects.size();
+		int poolSize = objects.size();
 		for( int i = 0; i < poolSize; ++i )
 		{
 			if( objects[i] != nullptr )
@@ -47,7 +47,7 @@ public:
 	/*
 	*	Creates a new object for this pool. 
 	*	WARNING, if this function's return value is not stored, return it back to the pool. 
-	*	TODO: Upgrade the concept/workflow here, avoid gangling pointers and track newly created object: MAP?
+	*	TODO: Upgrade the concept/workflow here, avoid dangling pointers and track newly created object: MAP?
 	*	@return T*:		The object created from this pool
 	*/
 	template<typename ... Args>

@@ -13,7 +13,7 @@ namespace ECS {
 
 	using ComponentId = uint64_t;
 
-	static constexpr size_t MAX_ENTITIES	{ 1000 };
+	static constexpr size_t MAX_ENTITIES	{ 10000 };
 
 	static constexpr size_t MAX_COMPONENTS_PER_ENTITY	{ 1000 };
 

@@ -130,13 +130,11 @@ namespace ECS
 			{
 				if( s != nullptr )
 				{
-
 					if( T::ID == s->m_systemId )
 					{
 						// When we find a system with the same id, we will remove it from our array of active systems
 						return dynamic_cast< T* >( s );
 					}
-
 
 				}
 				else // The moment we find a null system, we now we are at the end of the array, no need to continue
