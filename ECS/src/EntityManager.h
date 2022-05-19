@@ -1,3 +1,5 @@
+// MIT License, Copyright (c) 2022 Malik Allen
+
 #ifndef ENTITYMANAGER_H
 #define ENTITYMANAGER_H
 

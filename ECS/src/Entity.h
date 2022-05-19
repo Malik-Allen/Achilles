@@ -1,3 +1,5 @@
+// MIT License, Copyright (c) 2022 Malik Allen
+
 #ifndef ENTITY_H
 #define ENTITY_H
 

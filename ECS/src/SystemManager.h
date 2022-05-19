@@ -1,3 +1,5 @@
+// MIT License, Copyright (c) 2022 Malik Allen
+
 #ifndef SYSTEMMANAGER_H
 #define SYSTEMMANAGER_H
 

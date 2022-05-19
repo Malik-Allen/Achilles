@@ -1,3 +1,5 @@
+// MIT License, Copyright (c) 2022 Malik Allen
+
 #ifndef ISYSTEM_H
 #define ISYSTEM_H
 

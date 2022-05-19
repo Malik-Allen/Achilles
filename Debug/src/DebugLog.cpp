@@ -1,5 +1,6 @@
-#include "../include/DebugLog.h"
+// MIT License, Copyright (c) 2022 Malik Allen
 
+#include "../include/DebugLog.h"
 
 std::string DebugLog::outputLogFileName( "Output-Log.txt" );
 
