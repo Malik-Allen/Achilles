@@ -1,2 +1,2 @@
 # Achilles
-Set of utility files to support development across any project
+Set of utility frameworks to support development across any c++ project
